@@ -6,6 +6,8 @@ import element.Element;
 import exceptions.IllegalTypeException;
 import exceptions.IncompatibleDimensions;
 
+import java.util.function.Function;
+
 public class Matrix<T> implements Matrices<T> {
     Class<? extends Number> clazz;
     private int rows;
@@ -36,30 +38,25 @@ public class Matrix<T> implements Matrices<T> {
         }
     }
 
-    @Override
-    public Matrix<T> add(Matrix<T> elements) throws IncompatibleDimensions {
+    private Matrix<T> calculate(Matrix<T> l, Function<Element<T>[], Element<T>> f) {
         Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, clazz);
-        if (elements.getCountColumns() != columns || elements.getCountRows() != rows)
+        if (l.getCountColumns() != columns || l.getCountRows() != rows)
             throw new IncompatibleDimensions();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                resultMatrix.set(this.elements[i][j].add(elements.get(i + 1, j + 1)), i + 1, j + 1);
+                resultMatrix.set(f.apply(new Element[]{this.elements[i][j], l.get(i + 1, j + 1)}), i + 1, j + 1);
             }
         }
         return resultMatrix;
     }
 
+    public Matrix add(Matrix<T> elements) throws IncompatibleDimensions {
+        return calculate(elements, element -> element[0].add(element[1]));
+    }
+
     @Override
     public Matrix<T> subtract(Matrix<T> elements) throws IncompatibleDimensions {
-        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, clazz);
-        if (elements.getCountColumns() != columns || elements.getCountRows() != rows)
-            throw new IncompatibleDimensions();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                resultMatrix.set(this.elements[i][j].subtract(elements.get(i + 1, j + 1)), i + 1, j + 1);
-            }
-        }
-        return resultMatrix;
+        return calculate(elements, element -> element[0].subtract(element[1]));
     }
 
     @Override
