@@ -2,7 +2,7 @@ package complex;
 
 import java.util.Objects;
 
-public class Complex {
+public class Complex extends Number {
     private final double re;   // the real part
     private final double im;   // the imaginary part
 
@@ -10,6 +10,17 @@ public class Complex {
     public Complex(double real, double imag) {
         re = real;
         im = imag;
+    }
+
+    // a static version of plus
+    public static Complex plus(Complex a, Complex b) {
+        double real = a.re + b.re;
+        double imag = a.im + b.im;
+        return new Complex(real, imag);
+    }
+
+    static Complex add(Complex first, Complex second) {
+        return first.plus(second);
     }
 
     // return a string representation of the invoking complex.Complex object
@@ -105,14 +116,6 @@ public class Complex {
         return sin().divides(cos());
     }
 
-
-    // a static version of plus
-    public static Complex plus(Complex a, Complex b) {
-        double real = a.re + b.re;
-        double imag = a.im + b.im;
-        return new Complex(real, imag);
-    }
-
     public boolean equals(Object x) {
         if (x == null) return false;
         if (this.getClass() != x.getClass()) return false;
@@ -122,5 +125,25 @@ public class Complex {
 
     public int hashCode() {
         return Objects.hash(re, im);
+    }
+
+    @Override
+    public int intValue() {
+        return 0;
+    }
+
+    @Override
+    public long longValue() {
+        return 0;
+    }
+
+    @Override
+    public float floatValue() {
+        return 0;
+    }
+
+    @Override
+    public double doubleValue() {
+        return 0;
     }
 }

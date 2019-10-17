@@ -1,47 +1,133 @@
 package matrix;
 
+import element.ComplexElement;
+import element.DoubleElement;
 import element.Element;
+import exceptions.IllegalTypeException;
 import exceptions.IncompatibleDimensions;
 
-import java.io.*;
+public class Matrix<T> implements Matrices<T> {
+    Class<? extends Number> clazz;
+    private int rows;
+    private int columns;
+    private Element[][] elements;
 
-public interface Matrix<T> extends Serializable {
-
-    Matrix add(Matrix elements) throws IncompatibleDimensions;
-    Matrix subtract(Matrix elements) throws IncompatibleDimensions;
-    Matrix multilpy(Matrix elements) throws IncompatibleDimensions;
-    Matrix multiply(double multiplyOnThe);
-    Matrix det();
-    Matrix[] getLU();
-    Matrix gauss();
-
-    int getCountRows();
-    int getCountColumns();
-
-    void set(Element<T> element, int row, int column);
-    Element<T> get(int row, int column);
-
-    Class getType();
-
-    default Matrix<T> clone() {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream ous;
-            ous = new ObjectOutputStream(baos);
-            ous.writeObject(this);
-            ous.close();
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (Matrix<T>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+    public Matrix(int rows, int columns, Class<? extends Number> clazz) throws IllegalTypeException {
+        this.rows = rows;
+        this.columns = columns;
+        this.clazz = clazz;
+        elements = new Element[rows][columns];
+        switch (clazz.getSimpleName()) {
+            case "double", "Double" -> {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < columns; j++) {
+                        elements[i][j] = new DoubleElement();
+                    }
+                }
+            }
+            case "Complex" -> {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < columns; j++) {
+                        elements[i][j] = new ComplexElement();
+                    }
+                }
+            }
+            default -> throw new IllegalTypeException();
         }
+    }
+
+    @Override
+    public Matrix<T> add(Matrix<T> elements) throws IncompatibleDimensions {
+        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, clazz);
+        if (elements.getCountColumns() != columns || elements.getCountRows() != rows)
+            throw new IncompatibleDimensions();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                resultMatrix.set(this.elements[i][j].add(elements.get(i + 1, j + 1)), i + 1, j + 1);
+            }
+        }
+        return resultMatrix;
+    }
+
+    @Override
+    public Matrix<T> subtract(Matrix<T> elements) throws IncompatibleDimensions {
+        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, clazz);
+        if (elements.getCountColumns() != columns || elements.getCountRows() != rows)
+            throw new IncompatibleDimensions();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                resultMatrix.set(this.elements[i][j].subtract(elements.get(i + 1, j + 1)), i + 1, j + 1);
+            }
+        }
+        return resultMatrix;
+    }
+
+    @Override
+    public Matrix<T> multiply(Matrix<T> elements) throws IncompatibleDimensions {
+        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, clazz);
+        for (int i = 0; i < this.getCountRows(); i++) {
+            for (int j = 0; j < elements.getCountColumns(); j++) {
+                for (int k = 0; k < this.getCountRows(); k++) {
+                    resultMatrix.set(resultMatrix.get(i + 1, j + 1).add(this.get(i + 1, k + 1).multiply(elements.get(k + 1, j + 1))), i + 1, j + 1);
+                }
+            }
+        }
+        return resultMatrix;
+    }
+
+    @Override
+    public Matrix<T> multiply(double multiplyOnThe) {
+        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, clazz);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                resultMatrix.set(this.elements[i][j].multiply(multiplyOnThe), i + 1, j + 1);
+            }
+        }
+        return resultMatrix;
+    }
+
+    @Override
+    public Matrix<T> det() {
         return null;
     }
 
-    default String toStringView(){
+    @Override
+    public Matrix<T>[] getLU() {
+        return null;
+    }
+
+    @Override
+    public Matrix<T> gauss() {
+        return null;
+    }
+
+    @Override
+    public int getCountRows() {
+        return rows;
+    }
+
+    @Override
+    public int getCountColumns() {
+        return columns;
+    }
+
+    public void set(Element<T> element, int row, int column) {
+        elements[row - 1][column - 1] = element;
+    }
+
+    public Element<T> get(int row, int column) throws ArrayIndexOutOfBoundsException {
+        return elements[row - 1][column - 1];
+    }
+
+    @Override
+    public Matrix<T> clone() {
+        return Matrices.super.clone();
+    }
+
+    @Override
+    public String toString() {
         StringBuilder builder = new StringBuilder();
-        for(int i = 1; i <= getCountRows(); i++) {
+        for (int i = 1; i <= getCountRows(); i++) {
             for (int j = 1; j <= getCountColumns(); j++) {
                 builder.append(this.get(i, j).get()).append(" ");
             }
@@ -49,4 +135,5 @@ public interface Matrix<T> extends Serializable {
         }
         return builder.toString();
     }
+
 }

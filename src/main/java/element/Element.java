@@ -28,5 +28,4 @@ public interface Element<T> {
     void set(T element);
 
     T get();
-
 }

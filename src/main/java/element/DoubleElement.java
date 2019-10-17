@@ -12,17 +12,17 @@ public class DoubleElement implements Element<Double> {
     }
 
     public DoubleElement(Element<Double> element) {
-        this((Double) element.get());
+        this(element.get());
     }
 
     @Override
     public Element<Double> add(Element<Double> element) {
-        return new DoubleElement(this.element + (Double) element.get());
+        return new DoubleElement(this.element + element.get());
     }
 
     @Override
     public Element<Double> multiply(Element<Double> element) {
-        return new DoubleElement(this.element * (Double) element.get());
+        return new DoubleElement(this.element * element.get());
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DoubleElement implements Element<Double> {
 
     @Override
     public Element<Double> divide(Element<Double> element) {
-        return new DoubleElement(this.element / (Double) element.get());
+        return new DoubleElement(this.element / element.get());
     }
 
     @Override
@@ -42,12 +42,12 @@ public class DoubleElement implements Element<Double> {
 
     @Override
     public boolean equals(Element<Double> element) {
-        return this.element == (Double) element.get();
+        return this.element == element.get();
     }
 
     @Override
     public int compareTo(Element<Double> element) {
-        return sgn((Double) element.get() - this.element);
+        return sgn(element.get() - this.element);
     }
 
     @Override
