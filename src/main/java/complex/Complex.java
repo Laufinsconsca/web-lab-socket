@@ -2,9 +2,11 @@ package complex;
 
 import java.util.Objects;
 
-public class Complex extends Number {
-    private final double re;   // the real part
-    private final double im;   // the imaginary part
+public class Complex {
+    public static final Class<Complex> TYPE = Complex.class;
+    public static final Complex ZERO = new Complex(0, 0);
+    private double re;   // the real part
+    private double im;   // the imaginary part
 
     // create a new object with the given real and imaginary parts
     public Complex(double real, double imag) {
@@ -21,6 +23,88 @@ public class Complex extends Number {
 
     static Complex add(Complex first, Complex second) {
         return first.plus(second);
+    }
+
+    public static double[] parseStringToComplex(String text) {
+        String c, a, b;
+        String[] sub, i;
+        if (text != null) {
+            c = text.replaceAll(" ", "");
+            try {
+                if (c.isEmpty()) {
+                    return new double[]{0, 0};
+                } else {
+                    if (c.contains("i")) {
+                        if (c.substring(1).contains("-")) {
+                            if (c.charAt(0) == '-') {
+                                sub = c.substring(1).split("-");
+                                i = sub[1].split("i");
+                                a = "-" + sub[0];
+                                if (sub[1].charAt(0) != 'i') {
+                                    b = "-" + i[0];
+                                } else {
+                                    b = "-1";
+                                }
+                            } else {
+                                sub = c.split("-");
+                                i = sub[1].split("i");
+                                a = sub[0];
+                                if (sub[1].charAt(0) != 'i') {
+                                    b = "-" + i[0];
+                                } else {
+                                    b = "-1";
+                                }
+                            }
+                        } else if (c.contains("+")) {
+                            if (c.substring(0, 1).equals("-")) {
+                                sub = c.split("\\+");
+                                i = sub[1].split("i");
+                                a = "-" + sub[0];
+                                if (sub[1].charAt(0) != 'i') {
+                                    b = i[0];
+                                } else {
+                                    b = "1";
+                                }
+                            } else {
+                                sub = c.split("\\+");
+                                i = sub[1].split("i");
+                                a = sub[0];
+                                if (sub[1].charAt(0) != 'i') {
+                                    b = i[0];
+                                } else {
+                                    b = "1";
+                                }
+                            }
+                        } else {
+                            i = c.split("i");
+                            a = "0";
+                            if (c.charAt(0) == '-') {
+                                if (c.charAt(1) == 'i') {
+                                    b = "-1";
+                                } else {
+                                    b = i[0];
+                                }
+                            } else {
+                                if (c.charAt(0) == 'i') {
+                                    b = "1";
+                                } else {
+                                    b = i[0];
+                                }
+                            }
+                        }
+                    } else {
+                        a = c;
+                        b = "0";
+                    }
+                    return new double[]{Double.parseDouble(a), Double.parseDouble(b)};
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            return new double[]{0, 0};
+        }
+        return new double[0];
     }
 
     // return a string representation of the invoking complex.Complex object
@@ -90,6 +174,14 @@ public class Complex extends Number {
         return im;
     }
 
+    public void setRe(double re) {
+        this.re = re;
+    }
+
+    public void setIm(double im) {
+        this.im = im;
+    }
+
     // return a / b
     public Complex divides(Complex b) {
         Complex a = this;
@@ -125,25 +217,5 @@ public class Complex extends Number {
 
     public int hashCode() {
         return Objects.hash(re, im);
-    }
-
-    @Override
-    public int intValue() {
-        return 0;
-    }
-
-    @Override
-    public long longValue() {
-        return 0;
-    }
-
-    @Override
-    public float floatValue() {
-        return 0;
-    }
-
-    @Override
-    public double doubleValue() {
-        return 0;
     }
 }

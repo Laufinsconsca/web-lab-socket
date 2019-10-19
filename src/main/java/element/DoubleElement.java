@@ -1,7 +1,7 @@
 package element;
 
 public class DoubleElement implements Element<Double> {
-    double element;
+    private double element;
 
     public DoubleElement() {
         this(0);

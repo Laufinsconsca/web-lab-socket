@@ -1,56 +1,72 @@
 package element;
 
 import complex.Complex;
+import exceptions.IllegalTypeException;
 
 public class ComplexElement implements Element<Complex> {
 
+    private Complex element;
+
+    public ComplexElement(Complex number) {
+        element = number;
+    }
+
+    public ComplexElement(String text) {
+        double[] element = Complex.parseStringToComplex(text);
+        this.element = new Complex(element[0], element[1]);
+    }
+
+    public ComplexElement(double real, double imag) {
+        this(new Complex(real, imag));
+    }
+
     @Override
     public Element<Complex> add(Element<Complex> element) {
-        return null;
+        return new ComplexElement(this.element.plus(element.get()));
     }
 
     @Override
     public Element<Complex> multiply(Element<Complex> element) {
-        return null;
+        return new ComplexElement(this.element.times(element.get()));
     }
 
     @Override
     public Element<Complex> multiply(double num) {
-        return null;
+        return new ComplexElement(this.element.scale(num));
     }
 
     @Override
     public Element<Complex> divide(Element<Complex> element) {
-        return null;
+        return new ComplexElement(this.element.times(element.get().reciprocal()));
     }
 
     @Override
     public Element<Complex> reciprocal() {
-        return null;
+        return new ComplexElement(this.element.reciprocal());
     }
 
     @Override
     public boolean equals(Element<Complex> element) {
-        return false;
+        return this.element.equals(element);
     }
 
     @Override
     public int compareTo(Element<Complex> element) {
-        return 0;
+        throw new IllegalTypeException("The type doesn't possess a operation of compare");
     }
 
     @Override
     public void set(Element<Complex> element) {
-
+        this.element = element.get();
     }
 
     @Override
     public void set(Complex element) {
-
+        this.element = element;
     }
 
     @Override
     public Complex get() {
-        return null;
+        return element;
     }
 }
