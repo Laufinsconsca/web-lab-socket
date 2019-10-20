@@ -5,7 +5,6 @@ import element.ComplexElement;
 import element.DoubleElement;
 import element.Element;
 import exceptions.IllegalTypeException;
-import exceptions.InvalidArrayLength;
 
 import java.util.Arrays;
 
@@ -29,11 +28,22 @@ public class ElementFactory {
     }
 
     public Element<?> create(Object arg) {
+        switch (arg.getClass().getSimpleName()) {
+            case "double[]" -> arg = Arrays.stream((double[]) arg).boxed().toArray(Double[]::new);
+            case "int[]" -> arg = Arrays.stream((int[]) arg).boxed().toArray(Integer[]::new);
+            case "long[]" -> arg = Arrays.stream((long[]) arg).boxed().toArray(Long[]::new);
+        }
         switch (type.getSimpleName()) {
             case "double", "Double" -> {
                 switch (arg.getClass().getSimpleName()) {
+                    case "Double[]", "Integer[]", "Long[]" -> {
+                        if (((Number[]) arg).length == 2 && ((Number[]) arg)[1].doubleValue() == 0) {
+                            return new DoubleElement(((Number[]) arg)[0].doubleValue());
+                        }
+                        return null;
+                    }
                     case "double", "Double", "int", "Integer", "long", "Long" -> {
-                        return new DoubleElement((double) arg);
+                        return new DoubleElement(((Number) arg).doubleValue());
                     }
                     case "BigDecimal" -> {
                         // TODO
@@ -51,8 +61,11 @@ public class ElementFactory {
                     case "double", "Double", "int", "Integer", "long", "Long" -> {
                         return new ComplexElement(((Number) arg).doubleValue(), 0);
                     }
-                    case "double[]", "Double[]", "int[]", "Integer[]", "long[]", "Long[]" -> {
-                        return createInstanceOfArray(arg);
+                    case "Double[]", "Integer[]", "Long[]" -> {
+                        if (((Number[]) arg).length == 2) {
+                            return new ComplexElement(((Number[]) arg)[0].doubleValue(), ((Number[]) arg)[1].doubleValue());
+                        }
+                        return null;
                     }
                     case "ComplexBigDecimal" -> {
                         // TODO
@@ -106,28 +119,17 @@ public class ElementFactory {
         }
     }
 
-    private ComplexElement createInstanceOfArray(Object obj) {
-        if (obj instanceof double[]) {
-            return calculateComplexElement(Arrays.stream((double[]) obj).boxed().toArray(Double[]::new));
-        } else if (obj instanceof Double[]) {
-            return calculateComplexElement(obj);
-        } else if (obj instanceof int[]) {
-            return calculateComplexElement(Arrays.stream((int[]) obj).boxed().toArray(Integer[]::new));
-        } else if (obj instanceof Integer[]) {
-            return calculateComplexElement(obj);
-        } else if (obj instanceof long[]) {
-            return calculateComplexElement(Arrays.stream((long[]) obj).boxed().toArray(Long[]::new));
-        } else if (obj instanceof Long[]) {
-            return calculateComplexElement(obj);
-        }
+    // ************************
+    // for further optimization
+
+    public Element<?>[] createVector(Object[] args) {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> ComplexElement calculateComplexElement(Object arg) {
-        if (((T[]) arg).length == 2) {
-            return new ComplexElement(((Number) (((T[]) arg)[0])).doubleValue(), ((Number) (((T[]) arg)[1])).doubleValue());
-        }
-        throw new InvalidArrayLength();
+    public Element<?>[] createMatrix(Object[][] args) {
+        return null;
     }
+
+    // *************************
+
 }

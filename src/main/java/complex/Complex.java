@@ -14,6 +14,12 @@ public class Complex {
         im = imag;
     }
 
+    public Complex(String text) {
+        double[] number = Complex.parseStringToComplex(text);
+        re = number[0];
+        im = number[1];
+    }
+
     // a static version of plus
     public static Complex plus(Complex a, Complex b) {
         double real = a.re + b.re;

@@ -23,7 +23,11 @@ public class Matrix<T> implements Tensor<T>, Serializable {
 
     private ElementFactory factory;
 
-    public Matrix(String[][] elements, Class<?> type) {
+    private Matrix() {
+    }
+
+    public Matrix(String[][] elements, Class<?> type) throws IllegalTypeException {
+        isLegalType(type);
         this.rows = elements.length;
         this.columns = elements[0].length;
         this.type = type;
@@ -36,7 +40,12 @@ public class Matrix<T> implements Tensor<T>, Serializable {
         }
     }
 
+    public Matrix(double[][] elements, Class<?> type) throws IllegalTypeException {
+        this(new double[][][]{elements, new double[elements.length][elements[0].length]}, type);
+    }
+
     public Matrix(double[][][] elements, Class<?> type) throws IllegalTypeException {
+        isLegalType(type);
         this.rows = elements.length;
         this.columns = elements[0].length;
         this.type = type;
@@ -50,6 +59,7 @@ public class Matrix<T> implements Tensor<T>, Serializable {
     }
 
     public Matrix(int rows, int columns, Class<?> type) throws IllegalTypeException {
+        isLegalType(type);
         this.rows = rows;
         this.columns = columns;
         this.type = type;
@@ -125,6 +135,21 @@ public class Matrix<T> implements Tensor<T>, Serializable {
     public void set(Object element, int row, int column) {
         elements[row - 1][column - 1] = factory.create(element);
     }
+
+    // ************************
+    // for further optimization
+
+    @Override
+    public void setVectorInRow(Vector elements, int row) {
+
+    }
+
+    @Override
+    public void setVectorInColumn(Vector elements, int column) {
+
+    }
+
+    // ************************
 
     public Element<T> get(int row, int column) throws ArrayIndexOutOfBoundsException {
         return elements[row - 1][column - 1];
