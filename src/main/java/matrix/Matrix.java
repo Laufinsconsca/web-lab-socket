@@ -6,11 +6,12 @@ import element.factory.ElementFactory;
 import exceptions.IllegalTypeException;
 import exceptions.IncompatibleDimensions;
 
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.function.Function;
 
-public class Matrix<T> implements Tensor<T>, Serializable {
+public class Matrix<T> implements Serializable {
     private Class<?> type;
     private int rows;
     private int columns;
@@ -22,9 +23,6 @@ public class Matrix<T> implements Tensor<T>, Serializable {
     // ******************************************
 
     private ElementFactory factory;
-
-    private Matrix() {
-    }
 
     public Matrix(String[][] elements, Class<?> type) throws IllegalTypeException {
         isLegalType(type);
@@ -72,79 +70,61 @@ public class Matrix<T> implements Tensor<T>, Serializable {
         }
     }
 
-    private Matrix<T> calculate(Matrix<T> l, Function<Element<T>[], Element<T>> f) {
-        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, type);
+    private void calculate(Matrix<T> l, Function<Element<T>[], Element<T>> f) {
         if (l.getCountColumns() != columns || l.getCountRows() != rows)
             throw new IncompatibleDimensions();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                resultMatrix.set(f.apply(new Element[]{this.elements[i][j], l.get(i + 1, j + 1)}), i + 1, j + 1);
+                this.set(f.apply(new Element[]{this.elements[i][j], l.get(i + 1, j + 1)}), i + 1, j + 1);
             }
         }
-        return resultMatrix;
     }
 
-    public Matrix add(Matrix<T> elements) throws IncompatibleDimensions {
-        return calculate(elements, element -> element[0].add(element[1]));
+    public void add(Matrix<T> elements) throws IncompatibleDimensions {
+        calculate(elements, element -> element[0].add(element[1]));
     }
 
-    @Override
-    public Matrix<T> subtract(Matrix<T> elements) throws IncompatibleDimensions {
-        return calculate(elements, element -> element[0].subtract(element[1]));
+    public void subtract(Matrix<T> elements) throws IncompatibleDimensions {
+        calculate(elements, element -> element[0].subtract(element[1]));
     }
 
-    @Override
-    public Matrix<T> multiply(Matrix<T> elements) throws IncompatibleDimensions {
-        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, type);
+    public void multiply(Matrix<T> elements) throws IncompatibleDimensions {
         for (int i = 0; i < this.getCountRows(); i++) {
             for (int j = 0; j < elements.getCountColumns(); j++) {
                 for (int k = 0; k < this.getCountRows(); k++) {
-                    resultMatrix.set(resultMatrix.get(i + 1, j + 1).add(this.get(i + 1, k + 1).multiply(elements.get(k + 1, j + 1))), i + 1, j + 1);
+                    this.set(this.get(i + 1, j + 1).add(this.get(i + 1, k + 1).multiply(elements.get(k + 1, j + 1))), i + 1, j + 1);
                 }
             }
         }
-        return resultMatrix;
     }
 
-    @Override
-    public Matrix<T> multiply(double multiplyOnThe) {
-        Matrix<T> resultMatrix = new Matrix<>(this.rows, this.columns, type);
+    public void multiply(double multiplyOnThe) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                resultMatrix.set(this.elements[i][j].multiply(multiplyOnThe), i + 1, j + 1);
+                this.set(this.elements[i][j].multiply(multiplyOnThe), i + 1, j + 1);
             }
         }
-        return resultMatrix;
     }
 
-    @Override
     public int getCountRows() {
         return rows;
     }
 
-    @Override
     public int getCountColumns() {
         return columns;
     }
 
-    public void set(Element<T> element, int row, int column) {
-        elements[row - 1][column - 1] = element;
-    }
-
-    @Override
     public void set(Object element, int row, int column) {
-        elements[row - 1][column - 1] = factory.create(element);
+        elements[row - 1][column - 1] = element instanceof Element ? (Element<?>) element : factory.create(element);
     }
 
     // ************************
     // for further optimization
 
-    @Override
     public void setVectorInRow(Vector elements, int row) {
 
     }
 
-    @Override
     public void setVectorInColumn(Vector elements, int column) {
 
     }
@@ -155,14 +135,8 @@ public class Matrix<T> implements Tensor<T>, Serializable {
         return elements[row - 1][column - 1];
     }
 
-    @Override
     public Class<?> getType() {
         return type;
-    }
-
-    @Override
-    public Matrix<T> clone() {
-        return Tensor.super.clone();
     }
 
     @Override
@@ -178,11 +152,21 @@ public class Matrix<T> implements Tensor<T>, Serializable {
     }
 
     private Element<?> parseStringToElement(String text) {
-        double[] element = Complex.parseStringToComplex(text);
-        if (element[1] != 0 && (type.equals(Double.TYPE) || type.equals(BigDecimal.class))) {
-            throw new IllegalTypeException();
+        Double[] element = Complex.parseStringToComplex(text);
+        if (element[1] == 0 && (type.equals(Double.TYPE) || type.equals(BigDecimal.class))) {
+            return factory.create(element[0]);
         }
         return factory.create(element);
     }
 
+    private void isLegalType(Class<?> type) {
+        String s = type.getSimpleName().substring(0, 1).toUpperCase() + type.getSimpleName().substring(1);
+        if (s.equals("Int")) {
+            s = "Integer";
+        }
+        String finalS = s;
+        if (Arrays.stream(LegalTypes.values()).noneMatch(x -> x.toString().equals(finalS))) {
+            throw new IllegalTypeException();
+        }
+    }
 }

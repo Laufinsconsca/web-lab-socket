@@ -1,10 +1,13 @@
 package matrix;
 
 import complex.Complex;
+import complex.ComplexBigDecimal;
 import element.ComplexElement;
 import element.Element;
 import exceptions.IllegalTypeException;
 import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
 
 import static org.testng.Assert.assertThrows;
 
@@ -13,6 +16,10 @@ public class MatrixTest {
     @Test
     public void test() {
 
+        /*неверный тип*/
+        assertThrows(IllegalTypeException.class, () -> new Matrix<>(5, 5, String.class));
+
+        /*создание матрицы из массива*/
         int n = 3;
         double[][][] numbers = new double[n][n][2];
         for (int i = 0; i < n; i++) {
@@ -22,28 +29,26 @@ public class MatrixTest {
                 numbers[i][j][1] = 1;
             }
         }
-
-        double[][][] result = multiplyDirectly(numbers, numbers);
-        assertThrows(IllegalTypeException.class, () -> new Matrix<>(5, 5, String.class));
         Matrix<Complex> matrix = new Matrix<>(numbers, Complex.TYPE);
-        matrix = matrix.multiply(matrix);
+        matrix.multiply(matrix);
         System.out.println(matrix);
 
-        Matrix<Complex> first = new Matrix<>(2, 2, Complex.TYPE);
+        /*создание пустой матрицы с дальнейшим заданием её значений вручную*/
+        Matrix<ComplexBigDecimal> first = new Matrix<>(2, 2, ComplexBigDecimal.TYPE);
         first.set(new int[]{1, 2}, 1, 1);
         first.set(new int[]{2, 3}, 2, 2);
         first.set(new double[]{1, -1}, 1, 2);
         first.set(new ComplexElement("2 + 3i"), 1, 2);
-        Matrix<Complex> second = new Matrix<>(2, 2, Complex.TYPE);
-        second.set(new double[]{1, 2}, 1, 1);
-        second.set(new double[]{2, 3}, 2, 2);
-        second.set(new double[]{1, -1}, 1, 2);
-        second.set(new double[]{1, 0}, 1, 2);
-
-        Matrix<Complex> third = new Matrix<>(new String[][]{{"1 + 2i"}, {"6 - 3i"}}, Complex.TYPE);
-
+        Matrix<Complex> second = new Matrix<>(2, 2, BigDecimal.class);
+        second.set(1, 1, 1);
+        second.set(1, 2, 1);
+        second.set(2, 2, 2);
+        second.set(BigDecimal.valueOf(5), 1, 2);
         System.out.println(first.toString());
         System.out.println(second.toString());
+
+        /*создание матрицы из массива строк*/
+        Matrix<Complex> third = new Matrix<>(new String[][]{{"1+4i", "2"}, {"4","6"}}, ComplexBigDecimal.class);
         System.out.println(third.toString());
         System.out.println(third.getClass().getSimpleName());
     }

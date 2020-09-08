@@ -1,6 +1,8 @@
 package element;
 
-public interface Element<T> {
+import java.io.*;
+
+public interface Element<T> extends Serializable {
     Element<T> add(Element<T> element);
 
     default Element<T> subtract(Element<T> element) {

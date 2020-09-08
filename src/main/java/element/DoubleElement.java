@@ -1,5 +1,8 @@
 package element;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 public class DoubleElement implements Element<Double> {
     private double element;
 

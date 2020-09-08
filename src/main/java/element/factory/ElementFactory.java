@@ -1,11 +1,11 @@
 package element.factory;
 
 import complex.Complex;
-import element.ComplexElement;
-import element.DoubleElement;
-import element.Element;
+import complex.ComplexBigDecimal;
+import element.*;
 import exceptions.IllegalTypeException;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class ElementFactory {
@@ -14,7 +14,7 @@ public class ElementFactory {
 
     public ElementFactory(Class type) {
         switch (type.getSimpleName()) {
-            case "double", "Double", "Complex", "BigDecimal", "ComplexBigDecimal" -> this.type = type;
+            case "Double", "Complex", "BigDecimal", "ComplexBigDecimal" -> this.type = type;
             default -> throw new IllegalTypeException();
         }
     }
@@ -37,18 +37,18 @@ public class ElementFactory {
             case "double", "Double" -> {
                 switch (arg.getClass().getSimpleName()) {
                     case "Double[]", "Integer[]", "Long[]" -> {
-                        if (((Number[]) arg).length == 2 && ((Number[]) arg)[1].doubleValue() == 0) {
+                        if (((Object[])arg).length > 2) throw new IllegalTypeException();
+                        if (((Number[]) arg)[1].doubleValue() == 0) {
                             return new DoubleElement(((Number[]) arg)[0].doubleValue());
+                        } else {
+                            throw new IllegalTypeException(); // not quite correct, here should throws another exception
                         }
-                        return null;
                     }
                     case "double", "Double", "int", "Integer", "long", "Long" -> {
                         return new DoubleElement(((Number) arg).doubleValue());
                     }
                     case "BigDecimal" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new DoubleElement(((BigDecimal)arg).doubleValue());
                     }
                     default -> throw new IllegalTypeException();
                 }
@@ -62,15 +62,11 @@ public class ElementFactory {
                         return new ComplexElement(((Number) arg).doubleValue(), 0);
                     }
                     case "Double[]", "Integer[]", "Long[]" -> {
-                        if (((Number[]) arg).length == 2) {
-                            return new ComplexElement(((Number[]) arg)[0].doubleValue(), ((Number[]) arg)[1].doubleValue());
-                        }
-                        return null;
+                        if (((Object[])arg).length > 2) throw new IllegalTypeException();
+                        return new ComplexElement(((Number[]) arg)[0].doubleValue(), ((Number[]) arg)[1].doubleValue());
                     }
                     case "ComplexBigDecimal" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new ComplexElement((ComplexBigDecimal)arg);
                     }
                     default -> throw new IllegalTypeException();
                 }
@@ -78,14 +74,10 @@ public class ElementFactory {
             case "BigDecimal" -> {
                 switch (arg.getClass().getSimpleName()) {
                     case "BigDecimal" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new BigDecimalElement((BigDecimal) arg);
                     }
                     case "double", "Double", "int", "Integer", "long", "Long" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new BigDecimalElement(((Number)arg).doubleValue());
                     }
                     default -> throw new IllegalTypeException();
                 }
@@ -93,24 +85,32 @@ public class ElementFactory {
             case "ComplexBigDecimal" -> {
                 switch (arg.getClass().getSimpleName()) {
                     case "ComplexBigDecimal" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new ComplexBigDecimalElement((ComplexBigDecimal)arg);
+                    }
+                    case "BigDecimal" -> {
+                        return new ComplexBigDecimalElement((BigDecimal)arg, BigDecimal.ZERO);
+                    }
+                    case "BigDecimal[]" -> {
+                        if (((Object[])arg).length > 2) throw new IllegalTypeException();
+                        return new ComplexBigDecimalElement(((BigDecimal[])arg)[0], ((BigDecimal[])arg)[1]);
                     }
                     case "double", "Double", "int", "Integer", "long", "Long" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new ComplexBigDecimalElement(BigDecimal.valueOf(((Number)arg).doubleValue()), BigDecimal.ZERO);
                     }
-                    case "double[]", "Double[]", "int[]", "Integer[]", "long[]", "Long[]" -> {
-                        // TODO
-                        // createInstanceOfArray for ComplexBigDecimal
-                        return null;
+                    case "Double[]" -> {
+                        if (((Object[])arg).length > 2) throw new IllegalTypeException();
+                        return new ComplexBigDecimalElement(BigDecimal.valueOf((((Double[])arg)[0])), BigDecimal.valueOf((((Double[])arg)[1])));
+                    }
+                    case "Integer[]" -> {
+                        if (((Object[])arg).length > 2) throw new IllegalTypeException();
+                        return new ComplexBigDecimalElement(BigDecimal.valueOf((((Integer[])arg)[0])), BigDecimal.valueOf((((Integer[])arg)[1])));
+                    }
+                    case "Long[]" -> {
+                        if (((Object[])arg).length > 2) throw new IllegalTypeException();
+                        return new ComplexBigDecimalElement(BigDecimal.valueOf((((Long[])arg)[0])), BigDecimal.valueOf((((Long[])arg)[1])));
                     }
                     case "Complex" -> {
-                        // TODO
-                        // doSomething();
-                        return null;
+                        return new ComplexBigDecimalElement((Complex)arg);
                     }
                     default -> throw new IllegalTypeException();
                 }

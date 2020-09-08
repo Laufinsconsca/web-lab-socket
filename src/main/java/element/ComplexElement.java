@@ -1,7 +1,10 @@
 package element;
 
 import complex.Complex;
+import complex.ComplexBigDecimal;
 import exceptions.IllegalTypeException;
+
+import java.io.*;
 
 public class ComplexElement implements Element<Complex> {
 
@@ -11,8 +14,12 @@ public class ComplexElement implements Element<Complex> {
         element = number;
     }
 
+    public ComplexElement(ComplexBigDecimal number) {
+        element = new Complex(number.getReal().doubleValue(), number.getImag().doubleValue());
+    }
+
     public ComplexElement(String text) {
-        double[] element = Complex.parseStringToComplex(text);
+        Double[] element = Complex.parseStringToComplex(text);
         this.element = new Complex(element[0], element[1]);
     }
 
