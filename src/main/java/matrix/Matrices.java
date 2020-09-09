@@ -8,7 +8,7 @@ public class Matrices {
     private Matrices() {
     }
 
-    private static <T> Matrix<T> add(Matrix<T> f, Matrix<T> s) {
+    public static <T> Matrix<T> add(Matrix<T> f, Matrix<T> s) {
         Matrix<T> resultMatrix = new Matrix<>(f.getCountRows(), f.getCountColumns(), f.getType());
         if (s.getCountColumns() != f.getCountRows() || s.getCountRows() != f.getCountColumns())
             throw new IncompatibleDimensions();
@@ -20,7 +20,7 @@ public class Matrices {
         return resultMatrix;
     }
 
-    private static <T> Matrix<T> subtract(Matrix<T> f, Matrix<T> s) {
+    public static <T> Matrix<T> subtract(Matrix<T> f, Matrix<T> s) {
         Matrix<T> resultMatrix = new Matrix<>(f.getCountRows(), f.getCountColumns(), f.getType());
         if (s.getCountColumns() != f.getCountRows() || s.getCountRows() != f.getCountColumns())
             throw new IncompatibleDimensions();
@@ -32,7 +32,7 @@ public class Matrices {
         return resultMatrix;
     }
 
-    public <T> Matrix<T> multiply(Matrix<T> f, Matrix<T> s) throws IncompatibleDimensions {
+    public static <T> Matrix<T> multiply(Matrix<T> f, Matrix<T> s) throws IncompatibleDimensions {
         Matrix<T> resultMatrix = new Matrix<>(f.getCountRows(), f.getCountColumns(), f.getType());
         for (int i = 0; i < f.getCountRows(); i++) {
             for (int j = 0; j < s.getCountColumns(); j++) {
@@ -44,7 +44,7 @@ public class Matrices {
         return resultMatrix;
     }
 
-    public <T> Matrix<T> multiply(Matrix<T> f, double multiplyOnThe) {
+    public static <T> Matrix<T> multiply(Matrix<T> f, double multiplyOnThe) {
         Matrix<T> resultMatrix = new Matrix<>(f.getCountRows(), f.getCountColumns(), f.getType());
         for (int i = 0; i < f.getCountRows(); i++) {
             for (int j = 0; j < f.getCountColumns(); j++) {
@@ -54,34 +54,32 @@ public class Matrices {
         return resultMatrix;
     }
 
-    public static void serialize(BufferedOutputStream outputStream, Matrix<?> matrix) {
+    public static void serialize(ObjectOutputStream outputStream, Matrix<?> matrix) {
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(matrix.getType());
-            objectOutputStream.writeInt(matrix.getCountRows());
-            objectOutputStream.writeInt(matrix.getCountColumns());
+            outputStream.writeObject(matrix.getType());
+            outputStream.writeInt(matrix.getCountRows());
+            outputStream.writeInt(matrix.getCountColumns());
             for (int i = 0; i < matrix.getCountRows(); i++) {
                 for (int j = 0; j < matrix.getCountColumns(); j++) {
-                    objectOutputStream.writeObject(matrix.get(i + 1, j + 1));
+                    outputStream.writeObject(matrix.get(i + 1, j + 1));
                 }
             }
-            objectOutputStream.flush();
+            outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static Matrix<?> deserialize(BufferedInputStream inputStream) {
+    public static Matrix<?> deserialize(ObjectInputStream inputStream) {
         Matrix<?> matrix = null;
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            Class<?> type = (Class<?>) objectInputStream.readObject();
-            int rows = objectInputStream.readInt();
-            int columns = objectInputStream.readInt();
+            Class<?> type = (Class<?>) inputStream.readObject();
+            int rows = inputStream.readInt();
+            int columns = inputStream.readInt();
             matrix = new Matrix<>(rows, columns, type);
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
-                    matrix.set(objectInputStream.readObject(), i + 1, j + 1);
+                    matrix.set(inputStream.readObject(), i + 1, j + 1);
                 }
             }
         } catch (IOException | ClassNotFoundException e) {

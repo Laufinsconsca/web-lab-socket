@@ -10,8 +10,8 @@ public class MatrixSerializeTest {
     @Test
     public void serialize(){
 
-        try (BufferedOutputStream fileWriter = new BufferedOutputStream(new FileOutputStream("matrix.bin"))) {
-            Matrix<Complex> aMatrix = new Matrix<>(new String[][]{{"1", "2"}, {"4 + 5i","6"}}, Complex.TYPE);
+        try (ObjectOutputStream fileWriter = new ObjectOutputStream(new FileOutputStream("matrix2.bin"))) {
+            Matrix<Complex> aMatrix = new Matrix<>(new String[][]{{"1", "0"}, {"0","1"}}, Complex.TYPE);
             Matrices.serialize(fileWriter, aMatrix);
         } catch (IOException e) {
             e.printStackTrace();
@@ -21,7 +21,7 @@ public class MatrixSerializeTest {
     @Test
     public void deserialize(){
 
-        try (BufferedInputStream fileReader = new BufferedInputStream(new FileInputStream("matrix.bin"))) {
+        try (ObjectInputStream fileReader = new ObjectInputStream(new FileInputStream("matrix4.bin"))) {
             Matrix<?> aMatrix = Matrices.deserialize(fileReader);
             System.out.println(aMatrix);
         } catch (IOException e) {
