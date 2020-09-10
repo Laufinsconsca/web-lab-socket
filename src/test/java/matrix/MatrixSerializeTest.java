@@ -21,7 +21,7 @@ public class MatrixSerializeTest {
     @Test
     public void deserialize(){
 
-        try (ObjectInputStream fileReader = new ObjectInputStream(new FileInputStream("matrix4.bin"))) {
+        try (ObjectInputStream fileReader = new ObjectInputStream(new FileInputStream("matrix3.bin"))) {
             Matrix<?> aMatrix = Matrices.deserialize(fileReader);
             System.out.println(aMatrix);
         } catch (IOException e) {

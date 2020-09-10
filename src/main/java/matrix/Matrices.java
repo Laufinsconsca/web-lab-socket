@@ -1,5 +1,6 @@
 package matrix;
 
+import client.Action;
 import exceptions.IncompatibleDimensions;
 
 import java.io.*;
@@ -86,5 +87,22 @@ public class Matrices {
             e.printStackTrace();
         }
         return matrix;
+    }
+
+    public static void forServerCalculation(ObjectInputStream in, ObjectOutputStream out) {
+        try {
+            Matrix firstMatrix = Matrices.deserialize(in);
+            Matrix secondMatrix = Matrices.deserialize(in);
+            Action action = (Action)in.readObject();
+            Matrix resultMatrix = null;
+            switch (action) {
+                case MUL -> resultMatrix = Matrices.multiply(firstMatrix, secondMatrix);
+                case SUM -> resultMatrix = Matrices.add(firstMatrix, secondMatrix);
+            }
+            Matrices.serialize(out, resultMatrix);
+            out.flush(); // выталкиваем все из буфера
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }

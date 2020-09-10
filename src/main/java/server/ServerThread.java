@@ -24,20 +24,7 @@ public class ServerThread extends Thread {
 
     @Override
     public void run(){
-        try {
-            Matrix firstMatrix = Matrices.deserialize(in);
-            Matrix secondMatrix = Matrices.deserialize(in);
-            Action action = (Action)in.readObject();
-            Matrix resultMatrix = null;
-            switch (action) {
-                case MUL -> resultMatrix = Matrices.multiply(firstMatrix, secondMatrix);
-                case SUM -> resultMatrix = Matrices.add(firstMatrix, secondMatrix);
-            }
-            Matrices.serialize(out, resultMatrix);
-            out.flush(); // выталкиваем все из буфера
-            System.out.println("Клиент " + number + " завершил работу");
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
+        Matrices.forServerCalculation(in, out);
+        System.out.println("Результат " + number + " отправлен клиенту");
     }
 }

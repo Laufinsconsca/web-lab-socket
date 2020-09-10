@@ -5,10 +5,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 
-public class Server {
+public class ParallelServer {
 
     public static final int PORT = 5634;
-    private static volatile int number = 1;
+    private static int number = 1;
     public static LinkedList<ServerThread> serverList = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
