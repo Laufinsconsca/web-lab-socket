@@ -9,11 +9,13 @@ import java.net.Socket;
 
 public class ServerThread extends Thread {
 
-    private static Socket socket; //сокет для общения
-    private static ObjectInputStream in; // поток чтения из сокета
-    private static ObjectOutputStream out; // поток записи в сокет
+    private Socket socket; //сокет для общения
+    private int number;
+    private ObjectInputStream in; // поток чтения из сокета
+    private ObjectOutputStream out; // поток записи в сокет
 
-    public ServerThread(Socket socket) throws IOException {
+    public ServerThread(Socket socket, int number) throws IOException {
+        this.number = number;
         this.socket = socket;
         out = new ObjectOutputStream(socket.getOutputStream());
         in = new ObjectInputStream(socket.getInputStream());
@@ -33,7 +35,7 @@ public class ServerThread extends Thread {
             }
             Matrices.serialize(out, resultMatrix);
             out.flush(); // выталкиваем все из буфера
-            System.out.println("Клиент завершил работу");
+            System.out.println("Клиент " + number + " завершил работу");
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }

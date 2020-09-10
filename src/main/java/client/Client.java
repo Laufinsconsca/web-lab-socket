@@ -17,7 +17,7 @@ public class Client {
         try {
             try {
                 clientSocket = new Socket("localhost", 5634);
-                System.out.println("Подключен");
+                System.out.println("Соединение с сервером установлено\n");
                 in = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
                 out = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
 
@@ -41,21 +41,42 @@ public class Client {
                     e.printStackTrace();
                 }
 
+                System.out.println("Первая матрица:");
+                if (firstMatrix.getCountRows() <= 10 && firstMatrix.getCountColumns() <= 10) {
+                    System.out.println(firstMatrix);
+                } else {
+                    System.out.println("Матрица велика для отображения");
+                }
+                System.out.println("Вторая матрица:");
+                if (secondMatrix.getCountRows() <= 10 && secondMatrix.getCountColumns() <= 10) {
+                    System.out.println(firstMatrix);
+                } else {
+                    System.out.println("Матрица велика для отображения");
+                }
+                System.out.println("Действие: " + action);
+
                 Matrices.serialize(out, firstMatrix);
                 Matrices.serialize(out, secondMatrix);
                 out.writeObject(Action.valueOf(action));
                 out.flush();
+                System.out.println("Идёт вычисление...");
                 Matrix resultMatrix = Matrices.deserialize(in);
-                System.out.println(resultMatrix);
+                System.out.println("Результат:");
+                if (resultMatrix.getCountRows() <= 10 && resultMatrix.getCountColumns() <= 10) {
+                    System.out.println(resultMatrix);
+                } else {
+                    System.out.println("Матрица велика для отображения");
+                }
                 try (ObjectOutputStream resultMatrixWriter = new ObjectOutputStream(new FileOutputStream(resultMatrixName))) {
                     Matrices.serialize(resultMatrixWriter, resultMatrix);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                System.out.println("Готово"); // получив - выводим на экран
+                System.out.println("Готово, результат записан в " + resultMatrixName); // получив - выводим на экран
+                System.out.println("Соединение разорвано");
             } finally { // в любом случае необходимо закрыть сокет и потоки
-                System.out.println("Клиент был закрыт...");
+                System.out.println("Клиент был закрыт");
                 clientSocket.close();
                 in.close();
                 out.close();

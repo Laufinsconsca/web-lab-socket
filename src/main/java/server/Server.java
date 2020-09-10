@@ -8,6 +8,7 @@ import java.util.LinkedList;
 public class Server {
 
     public static final int PORT = 5634;
+    private static volatile int number = 1;
     public static LinkedList<ServerThread> serverList = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
@@ -15,11 +16,12 @@ public class Server {
         try {
             while (true) {
                 Socket socket = server.accept();
-                System.out.println("Клиент подключен");
+                System.out.println("Клиент " + number + " подключен");
                 try {
-                    serverList.add(new ServerThread(socket));
+                    serverList.add(new ServerThread(socket, number));
+                    number++;
                 } catch (IOException e) {
-                    System.out.println("Клиент завершил работу в связи с ошибкой");
+                    System.out.println("Клиент " + number + " завершил работу в связи с ошибкой");
                     socket.close();
                 }
             }
@@ -27,4 +29,6 @@ public class Server {
             server.close();
         }
     }
+
+
 }

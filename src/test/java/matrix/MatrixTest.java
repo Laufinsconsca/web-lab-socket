@@ -20,7 +20,7 @@ public class MatrixTest {
         assertThrows(IllegalTypeException.class, () -> new Matrix<>(5, 5, String.class));
 
         /*создание матрицы из массива*/
-        int n = 3;
+        int n = 500;
         double[][][] numbers = new double[n][n][2];
         for (int i = 0; i < n; i++) {
             numbers[i] = new double[n][2];
@@ -31,9 +31,9 @@ public class MatrixTest {
         }
         Matrix<Complex> matrix = new Matrix<>(numbers, Complex.TYPE);
         matrix.multiply(matrix);
-        System.out.println(matrix);
+        //System.out.println(matrix);
 
-        /*создание пустой матрицы с дальнейшим заданием её значений вручную*/
+        /*создание пустой матрицы с дальнейшим заданием её значений вручную*//*
         Matrix<ComplexBigDecimal> first = new Matrix<>(2, 2, ComplexBigDecimal.TYPE);
         first.set(new int[]{1, 2}, 1, 1);
         first.set(new int[]{2, 3}, 2, 2);
@@ -47,10 +47,10 @@ public class MatrixTest {
         System.out.println(first.toString());
         System.out.println(second.toString());
 
-        /*создание матрицы из массива строк*/
+        *//*создание матрицы из массива строк*//*
         Matrix<Complex> third = new Matrix<>(new String[][]{{"1+4i", "2"}, {"4","6"}}, ComplexBigDecimal.class);
         System.out.println(third.toString());
-        System.out.println(third.getClass().getSimpleName());
+        System.out.println(third.getClass().getSimpleName());*/
     }
 
     public double[][][] multiplyDirectly(double[][][]... arrays) {
