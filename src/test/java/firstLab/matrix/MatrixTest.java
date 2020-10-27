@@ -1,9 +1,9 @@
-package matrix;
+package firstLab.matrix;
 
-import complex.Complex;
-import complex.ComplexBigDecimal;
-import element.ComplexElement;
-import element.Element;
+import firstLab.complex.Complex;
+import firstLab.complex.ComplexBigDecimal;
+import firstLab.element.ComplexElement;
+import firstLab.element.Element;
 import exceptions.IllegalTypeException;
 import org.testng.annotations.Test;
 
@@ -30,7 +30,7 @@ public class MatrixTest {
             }
         }
         Matrix<Complex> matrix = new Matrix<>(numbers, Complex.TYPE);
-        matrix.multiply(matrix);
+        matrix = Matrices.multiply(matrix, matrix);
         System.out.println(matrix);
 
         //создание пустой матрицы с дальнейшим заданием её значений вручную

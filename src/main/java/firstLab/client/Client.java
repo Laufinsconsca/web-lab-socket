@@ -1,7 +1,7 @@
-package client;
+package firstLab.client;
 
-import matrix.Matrices;
-import matrix.Matrix;
+import firstLab.matrix.Matrices;
+import firstLab.matrix.Matrix;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,7 +15,7 @@ public class Client {
     public static void main(String[] args) {
         try {
             try {
-                clientSocket = new Socket("localhost", 5634);
+                clientSocket = new Socket("localhost", 5635);
                 System.out.println("Соединение с сервером установлено\n");
                 in = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
                 out = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
@@ -48,7 +48,7 @@ public class Client {
                 }
                 System.out.println("Вторая матрица:");
                 if (secondMatrix.getCountRows() <= 10 && secondMatrix.getCountColumns() <= 10) {
-                    System.out.println(firstMatrix);
+                    System.out.println(secondMatrix);
                 } else {
                     System.out.println("Матрица велика для отображения");
                 }
@@ -59,28 +59,42 @@ public class Client {
                 out.writeObject(Action.valueOf(action));
                 out.flush();
                 System.out.println("Идёт вычисление...");
-                Matrix resultMatrix = Matrices.deserialize(in);
-                System.out.println("Результат:");
-                if (resultMatrix.getCountRows() <= 10 && resultMatrix.getCountColumns() <= 10) {
-                    System.out.println(resultMatrix);
-                } else {
-                    System.out.println("Матрица велика для отображения");
+                Code code = (Code) in.readObject();
+                switch (code) {
+                    case VALID -> {
+                        Matrix resultMatrix = Matrices.deserialize(in);
+                        System.out.println("Результат:");
+                        if (resultMatrix.getCountRows() <= 10 && resultMatrix.getCountColumns() <= 10) {
+                            System.out.println(resultMatrix);
+                        } else {
+                            System.out.println("Матрица велика для отображения");
+                        }
+                        try (ObjectOutputStream resultMatrixWriter = new ObjectOutputStream(new FileOutputStream(resultMatrixName))) {
+                            Matrices.serialize(resultMatrixWriter, resultMatrix);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("Готово, результат записан в " + resultMatrixName);
+                    }
+                    case INCONSISTENT_DIMENSIONS -> {
+                        try (FileWriter errorReportWriter = new FileWriter(new File("error-report.log"))) {
+                            errorReportWriter.write("Размерности матриц не соответствуют: (" +
+                                    firstMatrix.getCountRows() + "," + firstMatrix.getCountColumns() + ") и (" +
+                                    secondMatrix.getCountRows() + "," + secondMatrix.getCountColumns() + ")");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("Сервер вернул ошибку код " + code.ordinal() + " подробности в error-report.log");
+                    }
                 }
-                try (ObjectOutputStream resultMatrixWriter = new ObjectOutputStream(new FileOutputStream(resultMatrixName))) {
-                    Matrices.serialize(resultMatrixWriter, resultMatrix);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                System.out.println("Готово, результат записан в " + resultMatrixName); // получив - выводим на экран
                 System.out.println("Соединение разорвано");
-            } finally { // в любом случае необходимо закрыть сокет и потоки
+            } finally {
                 System.out.println("Клиент был закрыт");
                 clientSocket.close();
                 in.close();
                 out.close();
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println(e);
         }
 

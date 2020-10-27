@@ -1,10 +1,8 @@
-package element;
+package firstLab.element;
 
-import complex.Complex;
-import complex.ComplexBigDecimal;
+import firstLab.complex.Complex;
+import firstLab.complex.ComplexBigDecimal;
 import exceptions.IllegalTypeException;
-
-import java.io.*;
 
 public class ComplexElement implements Element<Complex> {
 

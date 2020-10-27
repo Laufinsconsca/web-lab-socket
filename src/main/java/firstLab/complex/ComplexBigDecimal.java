@@ -1,4 +1,4 @@
-package complex;
+package firstLab.complex;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -58,7 +58,7 @@ public class ComplexBigDecimal {
                             if (coefficient.substring(0, 1).equals("-")) {
                                 pattern = coefficient.split("\\+");
                                 i = pattern[1].split("i");
-                                a = "-" + pattern[0];
+                                a = pattern[0];
                                 if (pattern[1].charAt(0) != 'i') {
                                     b = i[0];
                                 } else {
@@ -276,7 +276,7 @@ public class ComplexBigDecimal {
         return this;
     }
 
-    // return a string representation of the invoking complex.Complex object
+    // return a string representation of the invoking firstLab.complex.Complex object
     public String toString() {
         if (imag.equals(BigDecimal.ZERO)) return real.toString() + "";
         if (real.equals(BigDecimal.ZERO)) return imag.toString() + "i";

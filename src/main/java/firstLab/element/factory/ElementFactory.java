@@ -1,8 +1,8 @@
-package element.factory;
+package firstLab.element.factory;
 
-import complex.Complex;
-import complex.ComplexBigDecimal;
-import element.*;
+import firstLab.complex.Complex;
+import firstLab.complex.ComplexBigDecimal;
+import firstLab.element.*;
 import exceptions.IllegalTypeException;
 
 import java.math.BigDecimal;

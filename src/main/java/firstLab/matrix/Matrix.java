@@ -1,8 +1,8 @@
-package matrix;
+package firstLab.matrix;
 
-import complex.Complex;
-import element.Element;
-import element.factory.ElementFactory;
+import firstLab.complex.Complex;
+import firstLab.element.Element;
+import firstLab.element.factory.ElementFactory;
 import exceptions.IllegalTypeException;
 import exceptions.IncompatibleDimensions;
 
@@ -70,7 +70,7 @@ public class Matrix<T> implements Serializable {
         }
     }
 
-    private void calculate(Matrix<T> l, Function<Element<T>[], Element<T>> f) {
+/*    private void calculate(Matrix<T> l, Function<Element<T>[], Element<T>> f) {
         if (l.getCountColumns() != columns || l.getCountRows() != rows)
             throw new IncompatibleDimensions();
         for (int i = 0; i < rows; i++) {
@@ -91,12 +91,12 @@ public class Matrix<T> implements Serializable {
     public void multiply(Matrix<T> elements) throws IncompatibleDimensions {
         for (int i = 0; i < this.getCountRows(); i++) {
             for (int j = 0; j < elements.getCountColumns(); j++) {
-                for (int k = 0; k < this.getCountRows(); k++) {
+                for (int k = 0; k < this.getCountColumns(); k++) {
                     this.set(this.get(i + 1, j + 1).add(this.get(i + 1, k + 1).multiply(elements.get(k + 1, j + 1))), i + 1, j + 1);
                 }
             }
         }
-    }
+    }*/
 
     public void multiply(double multiplyOnThe) {
         for (int i = 0; i < rows; i++) {
@@ -168,5 +168,9 @@ public class Matrix<T> implements Serializable {
         if (Arrays.stream(LegalTypes.values()).noneMatch(x -> x.toString().equals(finalS))) {
             throw new IllegalTypeException();
         }
+    }
+
+    public boolean hasEqualDimensionsWith(Matrix<?> secondDimensions) {
+        return rows == secondDimensions.getCountRows() && columns == secondDimensions.getCountColumns();
     }
 }

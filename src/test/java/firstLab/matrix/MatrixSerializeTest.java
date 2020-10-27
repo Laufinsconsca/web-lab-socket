@@ -1,6 +1,6 @@
-package matrix;
+package firstLab.matrix;
 
-import complex.Complex;
+import firstLab.complex.Complex;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -10,8 +10,8 @@ public class MatrixSerializeTest {
     @Test
     public void serialize(){
 
-        try (ObjectOutputStream fileWriter = new ObjectOutputStream(new FileOutputStream("big_matrix.bin"))) {
-            Matrix<Complex> aMatrix = new Matrix<>(new String[][]{{"1", "0"}, {"0","1"}}, Complex.TYPE);
+        try (ObjectOutputStream fileWriter = new ObjectOutputStream(new FileOutputStream("bigMatrix.bin"))) {
+            Matrix<Complex> aMatrix = new Matrix<>(new String[][]{{"-1", "-2-i"}, {"8","6i"}, {"3", "5"}}, Complex.TYPE);
             Matrices.serialize(fileWriter, aMatrix);
         } catch (IOException e) {
             e.printStackTrace();
@@ -21,7 +21,7 @@ public class MatrixSerializeTest {
     @Test
     public void deserialize(){
 
-        try (ObjectInputStream fileReader = new ObjectInputStream(new FileInputStream("matrix3.bin"))) {
+        try (ObjectInputStream fileReader = new ObjectInputStream(new FileInputStream("thirdMatrix.bin"))) {
             Matrix<?> aMatrix = Matrices.deserialize(fileReader);
             System.out.println(aMatrix);
         } catch (IOException e) {

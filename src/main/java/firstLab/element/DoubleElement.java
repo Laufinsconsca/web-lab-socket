@@ -1,7 +1,4 @@
-package element;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+package firstLab.element;
 
 public class DoubleElement implements Element<Double> {
     private double element;

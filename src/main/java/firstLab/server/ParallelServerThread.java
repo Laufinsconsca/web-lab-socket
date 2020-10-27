@@ -1,20 +1,18 @@
-package server;
+package firstLab.server;
 
-import client.Action;
-import matrix.Matrices;
-import matrix.Matrix;
+import firstLab.matrix.Matrices;
 
 import java.io.*;
 import java.net.Socket;
 
-public class ServerThread extends Thread {
+public class ParallelServerThread extends Thread {
 
-    private Socket socket; //сокет для общения
+    private Socket socket;
     private int number;
-    private ObjectInputStream in; // поток чтения из сокета
-    private ObjectOutputStream out; // поток записи в сокет
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
 
-    public ServerThread(Socket socket, int number) throws IOException {
+    public ParallelServerThread(Socket socket, int number) throws IOException {
         this.number = number;
         this.socket = socket;
         out = new ObjectOutputStream(socket.getOutputStream());

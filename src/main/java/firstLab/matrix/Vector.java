@@ -1,4 +1,4 @@
-package matrix;
+package firstLab.matrix;
 
 public class Vector {
 }

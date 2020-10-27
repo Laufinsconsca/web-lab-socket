@@ -1,7 +1,8 @@
-package matrix;
+package firstLab.matrix;
 
-import client.Action;
+import firstLab.client.Action;
 import exceptions.IncompatibleDimensions;
+import firstLab.client.Code;
 
 import java.io.*;
 
@@ -34,10 +35,10 @@ public class Matrices {
     }
 
     public static <T> Matrix<T> multiply(Matrix<T> f, Matrix<T> s) throws IncompatibleDimensions {
-        Matrix<T> resultMatrix = new Matrix<>(f.getCountRows(), f.getCountColumns(), f.getType());
+        Matrix<T> resultMatrix = new Matrix<>(f.getCountRows(), s.getCountColumns(), f.getType());
         for (int i = 0; i < f.getCountRows(); i++) {
             for (int j = 0; j < s.getCountColumns(); j++) {
-                for (int k = 0; k < f.getCountRows(); k++) {
+                for (int k = 0; k < f.getCountColumns(); k++) {
                     resultMatrix.set(resultMatrix.get(i + 1, j + 1).add(f.get(i + 1, k + 1).multiply(s.get(k + 1, j + 1))), i + 1, j + 1);
                 }
             }
@@ -96,11 +97,25 @@ public class Matrices {
             Action action = (Action)in.readObject();
             Matrix resultMatrix = null;
             switch (action) {
-                case MUL -> resultMatrix = Matrices.multiply(firstMatrix, secondMatrix);
-                case SUM -> resultMatrix = Matrices.add(firstMatrix, secondMatrix);
+                case MUL -> {
+                    if (firstMatrix.getCountColumns() == secondMatrix.getCountRows()) {
+                        resultMatrix = Matrices.multiply(firstMatrix, secondMatrix);
+                        out.writeObject(Code.VALID);
+                    } else {
+                        out.writeObject(Code.INCONSISTENT_DIMENSIONS);
+                    }
+                }
+                case SUM -> {
+                    if (firstMatrix.hasEqualDimensionsWith(secondMatrix)) {
+                        resultMatrix = Matrices.add(firstMatrix, secondMatrix);
+                        out.writeObject(Code.VALID);
+                    } else {
+                        out.writeObject(Code.INCONSISTENT_DIMENSIONS);
+                    }
+                }
             }
             Matrices.serialize(out, resultMatrix);
-            out.flush(); // выталкиваем все из буфера
+            out.flush();
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }

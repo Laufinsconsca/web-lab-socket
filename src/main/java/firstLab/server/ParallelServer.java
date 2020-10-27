@@ -1,20 +1,16 @@
-package server;
-
-import matrix.Matrices;
+package firstLab.server;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
 
-public class SequentialServer {
-    public static final int PORT = 5634;
+public class ParallelServer {
+
+    public static final int PORT = 5635;
     private static int number = 1;
-    private static ObjectInputStream in;
-    private static ObjectOutputStream out;
+    public static LinkedList<ParallelServerThread> serverList = new LinkedList<>();
 
-    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         try {
@@ -22,10 +18,7 @@ public class SequentialServer {
                 Socket socket = server.accept();
                 System.out.println("Клиент " + number + " подключен");
                 try {
-                    out = new ObjectOutputStream(socket.getOutputStream());
-                    in = new ObjectInputStream(socket.getInputStream());
-                    Matrices.forServerCalculation(in, out);
-                    System.out.println("Результат " + number + " отправлен клиенту");
+                    serverList.add(new ParallelServerThread(socket, number));
                     number++;
                 } catch (IOException e) {
                     System.out.println("Клиент " + number + " завершил работу в связи с ошибкой");
@@ -36,4 +29,6 @@ public class SequentialServer {
             server.close();
         }
     }
+
+
 }
