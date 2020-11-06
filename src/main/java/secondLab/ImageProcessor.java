@@ -14,7 +14,7 @@ public class ImageProcessor {
 
     public static void main(String[] args) {
         try {
-            BufferedImage input = ImageIO.read(new File("C:\\Users\\walle\\IdeaProjects\\sled\\src\\main\\java\\secondLab\\image_2.jpg"));
+            BufferedImage input = ImageIO.read(new File("image.jpg"));
             BufferedImage output = applyFilter(input, smoothingKernel);
             ImageIO.write(output, "jpg", new File("savedImage.jpg"));
             Icon icon = new ImageIcon(output);
