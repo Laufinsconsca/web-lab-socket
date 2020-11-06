@@ -10,9 +10,10 @@ public class MatrixSerializeTest {
     @Test
     public void serialize(){
 
-        try (ObjectOutputStream fileWriter = new ObjectOutputStream(new FileOutputStream("bigMatrix.bin"))) {
-            Matrix<Complex> aMatrix = new Matrix<>(new String[][]{{"-1", "-2-i"}, {"8","6i"}, {"3", "5"}}, Complex.TYPE);
-            Matrices.serialize(fileWriter, aMatrix);
+        try (FileWriter fileWriter = new FileWriter(new File("thirdMatrix.txt"))) {
+            Matrix<Complex> aMatrix = new Matrix<>(new String[][]{{"5", "4"}, {"1","3"}}, Double.TYPE);
+            //System.out.println(aMatrix);
+            Matrices.writeToFile(fileWriter, aMatrix);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -21,8 +22,8 @@ public class MatrixSerializeTest {
     @Test
     public void deserialize(){
 
-        try (ObjectInputStream fileReader = new ObjectInputStream(new FileInputStream("thirdMatrix.bin"))) {
-            Matrix<?> aMatrix = Matrices.deserialize(fileReader);
+        try (FileReader fileReader = new FileReader(new File("matrix.txt"))) {
+            Matrix<?> aMatrix = Matrices.readFromFile(fileReader);
             System.out.println(aMatrix);
         } catch (IOException e) {
             e.printStackTrace();

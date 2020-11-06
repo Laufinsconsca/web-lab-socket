@@ -3,6 +3,7 @@ package firstLab.matrix;
 import firstLab.client.Action;
 import exceptions.IncompatibleDimensions;
 import firstLab.client.Code;
+import firstLab.complex.Complex;
 
 import java.io.*;
 
@@ -72,6 +73,17 @@ public class Matrices {
         }
     }
 
+    public static void writeToFile(FileWriter fileWriter, Matrix<?> matrix) {
+        try {
+            fileWriter.write(matrix.getCountRows() + "\n");
+            fileWriter.write(matrix.getCountColumns() + "\n");
+            fileWriter.write(matrix.toString());
+            fileWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Matrix<?> deserialize(ObjectInputStream inputStream) {
         Matrix<?> matrix = null;
         try {
@@ -85,6 +97,33 @@ public class Matrices {
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return matrix;
+    }
+
+    public static Matrix<?> readFromFile(FileReader fileReader) throws IllegalArgumentException{
+        Matrix<?> matrix = null;
+        StreamTokenizer streamTokenizer = new StreamTokenizer(fileReader);
+        try {
+            streamTokenizer.nextToken();
+            int rows = (int)streamTokenizer.nval;
+            streamTokenizer.nextToken();
+            int columns = (int)streamTokenizer.nval;
+            if (rows < 0 || columns < 0) {
+                throw new IllegalArgumentException("Одна (или обе) размерности меньше нуля");
+            }
+            streamTokenizer.nextToken();
+            matrix = new Matrix(rows, columns, Double.TYPE);
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    matrix.set(streamTokenizer.nval, i + 1, j + 1);
+                    streamTokenizer.nextToken();
+                }
+            }
+            //todo
+            streamTokenizer.nextToken();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return matrix;

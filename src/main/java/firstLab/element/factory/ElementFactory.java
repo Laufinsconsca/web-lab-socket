@@ -13,7 +13,11 @@ public class ElementFactory {
     private Class type;
 
     public ElementFactory(Class type) {
-        switch (type.getSimpleName()) {
+        String s = type.getSimpleName();
+        if (s.equals("double")) {
+            s = "Double";
+        }
+        switch (s) {
             case "Double", "Complex", "BigDecimal", "ComplexBigDecimal" -> this.type = type;
             default -> throw new IllegalTypeException();
         }

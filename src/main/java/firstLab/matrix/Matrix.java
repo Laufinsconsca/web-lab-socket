@@ -1,5 +1,6 @@
 package firstLab.matrix;
 
+import com.sun.jdi.connect.Connector;
 import firstLab.complex.Complex;
 import firstLab.element.Element;
 import firstLab.element.factory.ElementFactory;
@@ -114,7 +115,7 @@ public class Matrix<T> implements Serializable {
         return columns;
     }
 
-    public void set(Object element, int row, int column) {
+    public void set(Object element, int row, int column) throws IllegalArgumentException {
         elements[row - 1][column - 1] = element instanceof Element ? (Element<?>) element : factory.create(element);
     }
 

@@ -15,6 +15,7 @@ public class Client {
     public static void main(String[] args) {
         try {
             try {
+                Code code = Code.VALID;
                 clientSocket = new Socket("localhost", 5635);
                 System.out.println("Соединение с сервером установлено\n");
                 in = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
@@ -28,38 +29,44 @@ public class Client {
                 Matrix<?> firstMatrix = null;
                 Matrix<?> secondMatrix = null;
 
-                try (ObjectInputStream firstMatrixReader = new ObjectInputStream(new FileInputStream(firstMatrixName))) {
-                    firstMatrix = Matrices.deserialize(firstMatrixReader);
+                try (FileReader firstMatrixReader = new FileReader(new File(firstMatrixName))) {
+                    firstMatrix = Matrices.readFromFile(firstMatrixReader);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (IllegalArgumentException iaex) {
+                    code = Code.A_DIMENSION_LESS_THAN_ZERO;
                 }
 
-                try (ObjectInputStream secondMatrixReader = new ObjectInputStream(new FileInputStream(secondMatrixName))) {
-                    secondMatrix = Matrices.deserialize(secondMatrixReader);
+                try (FileReader secondMatrixReader = new FileReader(new File(secondMatrixName))) {
+                    secondMatrix = Matrices.readFromFile(secondMatrixReader);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (IllegalArgumentException iaex) {
+                    code = Code.A_DIMENSION_LESS_THAN_ZERO;
                 }
 
-                System.out.println("Первая матрица:");
-                if (firstMatrix.getCountRows() <= 10 && firstMatrix.getCountColumns() <= 10) {
-                    System.out.println(firstMatrix);
-                } else {
-                    System.out.println("Матрица велика для отображения");
-                }
-                System.out.println("Вторая матрица:");
-                if (secondMatrix.getCountRows() <= 10 && secondMatrix.getCountColumns() <= 10) {
-                    System.out.println(secondMatrix);
-                } else {
-                    System.out.println("Матрица велика для отображения");
-                }
-                System.out.println("Действие: " + action);
+                if (code.equals(Code.VALID)) {
+                    System.out.println("Первая матрица:");
+                    if (firstMatrix.getCountRows() <= 10 && firstMatrix.getCountColumns() <= 10) {
+                        System.out.println(firstMatrix);
+                    } else {
+                        System.out.println("Матрица велика для отображения");
+                    }
+                    System.out.println("Вторая матрица:");
+                    if (secondMatrix.getCountRows() <= 10 && secondMatrix.getCountColumns() <= 10) {
+                        System.out.println(secondMatrix);
+                    } else {
+                        System.out.println("Матрица велика для отображения");
+                    }
+                    System.out.println("Действие: " + action);
 
-                Matrices.serialize(out, firstMatrix);
-                Matrices.serialize(out, secondMatrix);
-                out.writeObject(Action.valueOf(action));
-                out.flush();
-                System.out.println("Идёт вычисление...");
-                Code code = (Code) in.readObject();
+                    Matrices.serialize(out, firstMatrix);
+                    Matrices.serialize(out, secondMatrix);
+                    out.writeObject(Action.valueOf(action));
+                    out.flush();
+                    System.out.println("Идёт вычисление...");
+                    code = (Code) in.readObject();
+                }
                 switch (code) {
                     case VALID -> {
                         Matrix resultMatrix = Matrices.deserialize(in);
@@ -69,22 +76,30 @@ public class Client {
                         } else {
                             System.out.println("Матрица велика для отображения");
                         }
-                        try (ObjectOutputStream resultMatrixWriter = new ObjectOutputStream(new FileOutputStream(resultMatrixName))) {
-                            Matrices.serialize(resultMatrixWriter, resultMatrix);
+                        try (FileWriter resultMatrixWriter = new FileWriter(new File(resultMatrixName))) {
+                            Matrices.writeToFile(resultMatrixWriter, resultMatrix);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         System.out.println("Готово, результат записан в " + resultMatrixName);
                     }
                     case INCONSISTENT_DIMENSIONS -> {
-                        try (FileWriter errorReportWriter = new FileWriter(new File("error-report.log"))) {
+                        try (FileWriter errorReportWriter = new FileWriter(new File("error-report.txt"))) {
                             errorReportWriter.write("Размерности матриц не соответствуют: (" +
                                     firstMatrix.getCountRows() + "," + firstMatrix.getCountColumns() + ") и (" +
                                     secondMatrix.getCountRows() + "," + secondMatrix.getCountColumns() + ")");
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        System.out.println("Сервер вернул ошибку код " + code.ordinal() + " подробности в error-report.log");
+                        System.out.println("Сервер вернул ошибку код " + code.ordinal() + " подробности в error-report.txt");
+                    }
+                    case A_DIMENSION_LESS_THAN_ZERO -> {
+                        try (FileWriter errorReportWriter = new FileWriter(new File("error-report.txt"))) {
+                            errorReportWriter.write("Одна (или обе) размерности меньше нуля");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("Ошибка при считывании код " + code.ordinal() + " подробности в error-report.txt");
                     }
                 }
                 System.out.println("Соединение разорвано");
