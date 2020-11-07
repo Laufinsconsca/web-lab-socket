@@ -8,27 +8,43 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageProcessor {
+    public static final double ZERO_SCALE = 0.5;
     private static final double[][] smoothingKernel = {{1. / 16, 1. / 8, 1. / 16}, {1. / 8, 1. / 4, 1. / 8}, {1. / 16, 1. / 8, 1. / 16}};
     private static final double[][] sharpingKernel = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
     private static final double[][] identicalKernel = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+    private static final double[][] embossKernel = {{-2, -1, 0}, {-1, 1, -1}, {0, 1, 2}};
+    private static final double[][] edgeEnhanceKernel = {{0, -1, 0}, {0, 1, 0}, {0, 0, 0}};
+    private static final double[][] edgeDetectKernel = {{0, -1, 0}, {-1, 4, -1}, {0, -1, 0}};
 
-    public static void main(String[] args) {
+    public static BufferedImage getImage(){
+        BufferedImage output = null;
         try {
             BufferedImage input = ImageIO.read(new File("image.jpg"));
-            BufferedImage output = applyFilter(input, smoothingKernel);
-            ImageIO.write(output, "jpg", new File("savedImage.jpg"));
-            Icon icon = new ImageIcon(output);
-            JLabel label = new JLabel(icon);
-            JFrame frame = new JFrame("Smoothed image");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.getContentPane().add(label, BorderLayout.CENTER);
-            frame.pack();
-            Runnable runner = new ImageProcessor.FrameShower(frame);
-            EventQueue.invokeLater(runner);
+            output = applyFilter(input, embossKernel);
+            ImageIO.write(output, "png", new File("embossedImage.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return output;
     }
+
+//    public static void main(String[] args) {
+//        try {
+//            BufferedImage input = ImageIO.read(new File("image.jpg"));
+//            BufferedImage output = applyFilter(input, embossKernel);
+//            ImageIO.write(output, "png", new File("embossedImage.png"));
+//            Icon icon = new ImageIcon(output);
+////            JLabel label = new JLabel(icon);
+////            JFrame frame = new JFrame("Embossed image");
+////            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+////            frame.getContentPane().add(label, BorderLayout.CENTER);
+////            frame.pack();
+////            Runnable runner = new ImageProcessor.FrameShower(frame);
+////            EventQueue.invokeLater(runner);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static BufferedImage applyFilter(BufferedImage input, double[][] kernel) {
         BufferedImage output = new BufferedImage(input.getWidth(), input.getHeight(),
@@ -136,7 +152,7 @@ public class ImageProcessor {
                 result += doubles[j];
             }
         }
-        return result;
+        return result == 0 ? ZERO_SCALE : result;
     }
 
     private static int convolve(int[][] pixels, double[][] kernel) {
